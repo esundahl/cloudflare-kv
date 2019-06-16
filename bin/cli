@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+const program = require('commander')
+const KV = require('../')
+
+const {ID, EMAIL, KEY} = require('../config.json')
+const kv = KV(ID, EMAIL, KEY)
+
+program
+	.version('0.1.0')
+
+program
+	.command('ls')
+	.description('List all namespaces')
+	.action(cmd => kv.listNamespaces().then(console.log))
+
+program
+	.command('create <title>')
+	.description('Create a new namespace')
+	.action((title, cmd) => kv.createNamespace(title).then(console.log))
+
+program
+	.command('rm <id>')
+	.description('Remove a namespace')
+	.action((id, cmd) => kv.removeNamespace(id).then(console.log))
+
+program
+	.command('keys <id>')
+	.description('List a namespaces keys')
+	.action((id, cmd) => kv.listKeys(id).then(console.log))
+
+program
+	.command('get <id> <key>')
+	.description('Get the value for a key')
+	.action((id, key, cmd) => kv.readKey(id, key).then(console.log))
+
+program
+	.command('set <id> <key> <value>')
+	.description('Set the value for a key')
+	.action((id, key, value, cmd) => kv.writeKey(id, key, value).then(console.log))
+
+program
+	.command('delete <id> <key>')
+	.description('Remove a key')
+	.action((id, key, cmd) => kv.removeKey(id, key).then(console.log))
+
+program.parse(process.argv)
