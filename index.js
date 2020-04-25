@@ -75,20 +75,18 @@ KV.prototype.get = function(id, key) {
 		})
 }
 
-KV.prototype.put = function(id, key, value) {
-	const val = typeof value === 'string' ? value : JSON.stringify(value)
-  return request.put(`${this._url}/${id}/values/${key}`, val, {
+KV.prototype.put = function (id, key, value) {
+	const kvs = (Array.isArray(key) ? key : [{ key, value }]).map(i => ({...i, value: JSON.stringify(i.value)}))
+	return request.put(`${this._url}/${id}/bulk`, kvs, {
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
-			'Content-Type': 'text/plain'
+			'Content-Type': 'application/json'
 		}
 	})
-		.then(response => Promise.resolve({key, value: val}))
 }
 
 KV.prototype.list = function(id, opts) {
-	console.log(`${this._url}/${id}/keys?${qs.stringify(opts)}`)
 	return request.get(`${this._url}/${id}/keys?${qs.stringify(opts)}`, {
 		headers: {
 			'X-Auth-Email': this._email,
@@ -98,14 +96,14 @@ KV.prototype.list = function(id, opts) {
 		.then(({data}) => data.result.map(r => r.name))
 }
 
-KV.prototype.delete = function(id, key) {
-	return request.delete(`${this._url}/${id}/values/${key}`, {
+KV.prototype.delete = function (id, key) {
+	const ks = Array.isArray(key) ? key : [key]
+	return request.delete(`${this._url}/bulk`, ks, {
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
 		}
 	})
-		.then(({data}) => data)
 }
 
 module.exports = KV
