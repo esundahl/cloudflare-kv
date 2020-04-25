@@ -1,5 +1,5 @@
 {
-  "name": "@esundahl/cloudflair-kv",
+  "name": "@esundahl/cloudflare-kv",
   "version": "0.0.2",
   "description": "",
   "main": "index.js",
