@@ -1,5 +1,5 @@
 
-const request = require('axios')
+
 const qs = require('query-string')
 
 function KV(id, email, key) {
@@ -12,44 +12,52 @@ function KV(id, email, key) {
 }
 
 KV.prototype.listNamespaces = function (opts) {
-	return request.get(`${this._url}?page=${1}&per_page=${50}`, {
+	return fetch(`${this._url}?page=${1}&per_page=${50}`, {
+		method: 'get',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
 		}
 	})
-		.then(response => response.data.result)
+		.then(response => response.json())
+		.then(data => data.result)
 }
 
 KV.prototype.createNamespace = function (title) {
-	return request.post(this._url, { title }, {
+	return fetch(this._url, {
+		method: 'post',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
 			"Content-Type": 'application/json'
-		}
+		},
+		body: JSON.stringify({ title })
 	})
-		.then(response => response.data.result)
+		.then(response => response.json())
+		.then(({result}) => result)
 }
 
 KV.prototype.removeNamespace = function (id) {
-	return request.delete(`${this._url}/${id}`, {
+	return fetch(`${this._url}/${id}`, {
+		method: 'delete',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
 			"Content-Type": 'application/json'
 		}
 	})
-		.then(response => Promise.resolve())
+		.then(response => response.json())
 }
 
 KV.prototype.renameNamespace = function (id, title) {
-	return request.put(`${this._url}/${id}`, { title }, {
+	return fetch(`${this._url}/${id}`, {
+		method: 'put',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
 			'Content-Type': 'application/json'
-		}
+		},
+		body: JSON.stringify({ title })
 	})
 		.then(response => Promise.resolve({ id, title }))
 }
@@ -60,50 +68,54 @@ KV.prototype.findNamespaceByName = function (title) {
 }
 
 KV.prototype.get = function (id, key) {
-	return request.get(`${this._url}/${id}/values/${key}`, {
+	return fetch(`${this._url}/${id}/values/${key}`, {
+		method: 'get',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
 			'Content-Type': 'application/json'
 		}
 	})
-		.then(({ data }) => {
-			try {
-				const parsed = JSON.parse(data)
-				return data
-			} catch (e) { return data }
-		})
+		.then(response => response.json().catch(err => response.text()))
 }
 
 KV.prototype.put = function (id, key, value) {
-	const kvs = (Array.isArray(key) ? key : [{ key, value }]).map(i => ({ key, value: JSON.stringify(i.value) }))
-	return request.put(`${this._url}/${id}/bulk`, kvs, {
+	const kv = (Array.isArray(key) ? key : [{ key, value }]).map(i => ({ key, value: JSON.stringify(i.value) }))
+	return fetch(`${this._url}/${id}/bulk`, {
+		method: 'put',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
 			'Content-Type': 'application/json'
-		}
+		},
+		body: (typeof kv === 'string') ? kv : JSON.stringify(kv)
 	})
+		.then(response => response.json())
 }
 
 KV.prototype.list = function (id, opts) {
-	return request.get(`${this._url}/${id}/keys?${qs.stringify(opts)}`, {
+	return fetch(`${this._url}/${id}/keys?${qs.stringify(opts)}`, {
+		method: 'get',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
 		}
 	})
-		.then(({ data }) => data.result.map(r => r.name))
+		.then(response => response.json())
+		.then(({ result }) => result.map(r => r.name))
 }
 
 KV.prototype.delete = function (id, key) {
-	const ks = Array.isArray(key) ? key : [key]
-	return request.delete(`${this._url}/bulk`, ks, {
+	const kv = Array.isArray(key) ? key : [key]
+	return fetch(`${this._url}/bulk`, {
+		method: 'delete',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
-		}
+		},
+		body: JSON.stringify(kv)
 	})
+		.then(response => response.json())
 }
 
 module.exports = KV
