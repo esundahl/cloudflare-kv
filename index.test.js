@@ -15,10 +15,18 @@ test('KV', async t => {
 		t.equal(namespace.title, title, 'new namespaces should have a title')
 		t.ok(namespace.id, 'new namespaces should have an id')
 
-		await kv.put(namespace.id, 'jdoe', {name: 'John Doe', age: 34})
+		await kv.put(namespace.id, 'jdoe', { name: 'John Doe', age: 34 })
 		const username = await kv.get(namespace.id, 'jdoe')
 		t.equal(username.name, 'John Doe', 'Should have the proper name property')
 		t.equal(username.age, 34, 'Should have the proper age property')
+
+		await kv.put(namespace.id, [{ key: 'sd', value: { name: 'Sunny D', age: 82 } }, { key: 'mj', value: { name: 'Michael Jordan', age: 56 } }])
+		const sd = await kv.get(namespace.id, 'sd')
+		t.equal(sd.name, 'Sunny D', 'Should have the proper name property')
+		t.equal(sd.age, 82, 'Should have the proper age property')
+		const mj = await kv.get(namespace.id, 'mj')
+		t.equal(mj.name, 'Michael Jordan', 'Should have the proper name property')
+		t.equal(mj.age, 56, 'Should have the proper age property')
 
 		await kv.put(namespace.id, 'authkey', authkey)
 		const key = await kv.get(namespace.id, 'authkey')

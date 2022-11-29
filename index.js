@@ -13,7 +13,7 @@ function KV(id, email, key) {
 
 KV.prototype.listNamespaces = function (opts) {
 	return fetch(`${this._url}?page=${1}&per_page=${50}`, {
-		method: 'get',
+		method: 'GET',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
@@ -25,7 +25,7 @@ KV.prototype.listNamespaces = function (opts) {
 
 KV.prototype.createNamespace = function (title) {
 	return fetch(this._url, {
-		method: 'post',
+		method: 'POST',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
@@ -39,7 +39,7 @@ KV.prototype.createNamespace = function (title) {
 
 KV.prototype.removeNamespace = function (id) {
 	return fetch(`${this._url}/${id}`, {
-		method: 'delete',
+		method: 'DELETE',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
@@ -51,7 +51,7 @@ KV.prototype.removeNamespace = function (id) {
 
 KV.prototype.renameNamespace = function (id, title) {
 	return fetch(`${this._url}/${id}`, {
-		method: 'put',
+		method: 'PUT',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
@@ -69,7 +69,7 @@ KV.prototype.findNamespaceByName = function (title) {
 
 KV.prototype.get = function (id, key) {
 	return fetch(`${this._url}/${id}/values/${key}`, {
-		method: 'get',
+		method: 'GET',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
@@ -80,9 +80,9 @@ KV.prototype.get = function (id, key) {
 }
 
 KV.prototype.put = function (id, key, value) {
-	const kv = (Array.isArray(key) ? key : [{ key, value }]).map(i => ({ key, value: JSON.stringify(i.value) }))
+	const kv = (Array.isArray(key) ? key : [{ key, value }]).map(i => ({ key: i.key, value: JSON.stringify(i.value) }))
 	return fetch(`${this._url}/${id}/bulk`, {
-		method: 'put',
+		method: 'PUT',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key,
@@ -95,7 +95,7 @@ KV.prototype.put = function (id, key, value) {
 
 KV.prototype.list = function (id, opts) {
 	return fetch(`${this._url}/${id}/keys?${qs.stringify(opts)}`, {
-		method: 'get',
+		method: 'GET',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
@@ -108,7 +108,7 @@ KV.prototype.list = function (id, opts) {
 KV.prototype.delete = function (id, key) {
 	const kv = Array.isArray(key) ? key : [key]
 	return fetch(`${this._url}/bulk`, {
-		method: 'delete',
+		method: 'DELETE',
 		headers: {
 			'X-Auth-Email': this._email,
 			'X-Auth-Key': this._key
