@@ -34,7 +34,7 @@ KV.prototype.createNamespace = function (title) {
 		body: JSON.stringify({ title })
 	})
 		.then(response => response.json())
-		.then(({result}) => result)
+		.then(({ result }) => result)
 }
 
 KV.prototype.removeNamespace = function (id) {
@@ -90,7 +90,7 @@ KV.prototype.put = function (id, key, value) {
 		},
 		body: (typeof kv === 'string') ? kv : JSON.stringify(kv)
 	})
-		.then(response => response.json())
+		.then(() => value || key)
 }
 
 KV.prototype.list = function (id, opts) {
