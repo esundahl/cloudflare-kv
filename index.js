@@ -76,7 +76,11 @@ KV.prototype.get = function (id, key) {
 			'Content-Type': 'application/json'
 		}
 	})
-		.then(response => response.json().catch(err => response.text()))
+		.then(response => {
+			if (response.status === 404) return
+			return response.json().catch(() => response.text())
+		})
+
 }
 
 KV.prototype.put = function (id, key, value) {

@@ -34,6 +34,9 @@ test('KV', async t => {
 		const key = await kv.get(namespace.id, 'authkey')
 		t.equal(key, authkey, 'should properly store and read strings')
 
+		const notFound = await kv.get(namespace.id, 'doesnotexist')
+		t.equal(notFound, undefined, 'Should be undefined when a value is not found')
+
 		const bar = await kv.put(namespace.id, 'foo', 'Erik')
 		await kv.put(namespace.id, 'foo/bar', 'hello')
 		await kv.put(namespace.id, 'foo/baz', 'world')
@@ -60,6 +63,7 @@ test('KV', async t => {
 		const namespaces = await kv.listNamespaces()
 		const missing = namespaces.find(n => n.id === namespace.id)
 		t.notOk(missing, 'Should have successfully removed the namespace')
+
 	} catch (e) { console.error(e) }
 
 })
