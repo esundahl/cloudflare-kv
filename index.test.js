@@ -44,16 +44,17 @@ test('KV', async t => {
 		t.equal(bar, 'Erik', 'Should return value after successful put')
 
 		const keys = await kv.list(namespace.id)
-		t.ok(keys.find(key => key === 'foo'), 'list should contain foo')
-		t.ok(keys.find(key => key === 'foo/bar'), 'list should contain foo/bar')
-		t.ok(keys.find(key => key === 'foo/baz'), 'list should contain foo/baz')
-		t.ok(keys.find(key => key === 'asdf'), 'list should contain asdf')
+
+		t.ok(keys.result.find(({ name }) => name === 'foo'), 'list should contain foo')
+		t.ok(keys.result.find(({ name }) => name === 'foo/bar'), 'list should contain foo/bar')
+		t.ok(keys.result.find(({ name }) => name === 'foo/baz'), 'list should contain foo/baz')
+		t.ok(keys.result.find(({ name }) => name === 'asdf'), 'list should contain asdf')
 
 		const foo = await kv.list(namespace.id, { prefix: 'foo' })
-		t.ok(foo.find(key => key === 'foo'), 'list with prefix should contain foo')
-		t.ok(foo.find(key => key === 'foo/bar'), 'list with prefix should contain foo/bar')
-		t.ok(foo.find(key => key === 'foo/baz'), 'list with prefix should contain foo/baz')
-		t.notOk(foo.find(key => key === 'asdf'), 'list with prefix should not contain asdf')
+		t.ok(foo.result.find(({ name }) => name === 'foo'), 'list with prefix should contain foo')
+		t.ok(foo.result.find(({ name }) => name === 'foo/bar'), 'list with prefix should contain foo/bar')
+		t.ok(foo.result.find(({ name }) => name === 'foo/baz'), 'list with prefix should contain foo/baz')
+		t.notOk(foo.result.find(({ name }) => name === 'asdf'), 'list with prefix should not contain asdf')
 
 		const renamed = await kv.renameNamespace(namespace.id, newTitle)
 		t.equal(renamed.id, namespace.id, 'Should return an id property after rename')
@@ -61,7 +62,7 @@ test('KV', async t => {
 
 		await kv.removeNamespace(namespace.id)
 		const namespaces = await kv.listNamespaces()
-		const missing = namespaces.find(n => n.id === namespace.id)
+		const missing = namespaces.result.find(n => n.id === namespace.id)
 		t.notOk(missing, 'Should have successfully removed the namespace')
 
 	} catch (e) { console.error(e) }

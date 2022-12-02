@@ -20,7 +20,6 @@ KV.prototype.listNamespaces = function (opts) {
 		}
 	})
 		.then(response => response.json())
-		.then(data => data.result)
 }
 
 KV.prototype.createNamespace = function (title) {
@@ -106,7 +105,6 @@ KV.prototype.list = function (id, opts) {
 		}
 	})
 		.then(response => response.json())
-		.then(({ result }) => result.map(r => r.name))
 }
 
 KV.prototype.delete = function (id, key) {
